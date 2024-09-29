@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="class01-servlet" />
         <module name="class02-request" />
+        <module name="class03-response" />
       </profile>
     </annotationProcessing>
   </component>
