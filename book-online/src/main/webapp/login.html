@@ -1,10 +1,370 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+    <title>用户登录与注册</title>
+    <link rel="stylesheet" href="css/style.css" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <style type="text/css">
+        /*iconfont图标，第三方登录用*/
+        @font-face {
+            font-family: 'iconfont';
+            src: url('//at.alicdn.com/t/font_1427254_qm1jfg7xsu.eot');
+            src: url('//at.alicdn.com/t/font_1427254_qm1jfg7xsu.eot?#iefix') format('embedded-opentype'),
+            url('//at.alicdn.com/t/font_1427254_qm1jfg7xsu.woff2') format('woff2'),
+            url('//at.alicdn.com/t/font_1427254_qm1jfg7xsu.woff') format('woff'),
+            url('//at.alicdn.com/t/font_1427254_qm1jfg7xsu.ttf') format('truetype'),
+            url('//at.alicdn.com/t/font_1427254_qm1jfg7xsu.svg#iconfont') format('svg');
+        }
 
+        .iconfont {
+            font-family: "iconfont", serif!important;
+            font-size: 28px;
+            font-style: normal;
+            -webkit-font-smoothing: antialiased;
+            -webkit-text-stroke-width: 0;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            background-size: cover;
+            background-color: rgb(47, 126, 138);
+            background-blend-mode: luminosity;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+        }
+
+        /* 公共输入框样式 */
+        .common-input-box {
+            width: 75%;
+            padding: 12px 15px;
+            background-color: #fff;
+            border: 1px solid #e4e6e5;
+            outline: none;
+            border-radius: 4px;
+            color: #333;
+            font-size: 13px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .common-input-box:focus {
+            border-color: rgb(36, 169, 190);
+            box-shadow: 0 0 5px rgba(36, 169, 190, 0.5);
+        }
+
+        /* 表单外层包裹容器样式 */
+        .form-wrap {
+            width: 400px;
+            height: auto;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            box-shadow: 2px 5px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .sign-box {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .sign-box h3 {
+            flex: 1 1 50%;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            font-size: 16px;
+            color: #555;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .default {
+            color: #ddd;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .active {
+            color: rgb(36, 169, 190);
+            border-bottom: 2px solid rgb(36, 169, 190);
+        }
+
+        .active:hover,
+        .default:hover {
+            color: rgb(36, 169, 190);
+        }
+
+        /* 登陆表单样式 */
+        .login-box {
+            width: 100%;
+            height: auto;
+            padding: 0;
+            text-align: center;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            width: 100%;
+            padding: 12px 0;
+            border: none;
+            outline: none;
+            border-radius: 5px;
+            background-color: rgb(36, 169, 190);
+            color: #fff;
+            box-shadow: 3px 6px 12px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: rgb(26, 139, 160);
+            box-shadow: 4px 7px 14px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 两条线和第三方登录字样横条区 */
+        .line-box {
+            width: 100%;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .line {
+            flex: 1 1 33%;
+            border-bottom: 1px solid #9b9b9b;
+        }
+
+        .login-3rd {
+            flex: 1 1 30%;
+            color: #9b9b9b;
+            font-size: 11px;
+            text-align: center;
+        }
+
+        /* 图标外层包裹区样式 */
+        .icon-box {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .icon-box i {
+            flex: 1 1 33%;
+            font-size: 28px;
+            color: #999;
+            transition: color 0.3s ease;
+            text-align: center;
+        }
+
+        .icon-box i:hover {
+            color: rgb(36, 169, 190);
+        }
+
+        /* 注册弹窗样式 */
+        #registerPopup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 380px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            box-shadow: 2px 5px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            z-index: 999;
+        }
+
+        #registerPopup h3 {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #555;
+        }
+
+        #registerPopup form div {
+            margin: 12px 0;
+        }
+
+        #registerPopup.close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 50%;
+            background-color: #ccc;
+            color: #fff;
+            cursor: pointer;
+            font-size: 18px;
+            line-height: 30px;
+            transition: background-color 0.3s ease;
+        }
+
+        #registerPopup.close-btn:hover {
+            background-color: #999;
+        }
+
+        /* 调整book-online的位置 */
+        #top {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        #top a h2 {
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            font-size: 24px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+<div id="top">
+    <a href="/index">
+        <h2>book-online</h2>
+    </a>
+</div>
+<div class="form-wrap">
+    <form id="loginForm" action="/login" method="post" class="login-box">
+        <div class="sign-box">
+            <h3 class="active">密码登录</h3>
+            <h3 class="default">短信登录/注册</h3>
+        </div>
+        <div>
+            <label>
+                <input type="text" name="account" class="common-input-box" placeholder="手机号/邮箱">
+            </label>
+        </div>
+        <div>
+            <label>
+                <input type="password" name="password" class="common-input-box" placeholder="密码">
+            </label>
+        </div>
+        <div>
+            <label>
+                <input type="submit" value="立即登录" class="btn">
+            </label>
+        </div>
+        <div>
+            <input type="button" value="注册" id="showRegisterPopup" class="btn">
+        </div>
+        <div class="line-box">
+            <span class="line"></span>
+            <span class="login-3rd">第三方登录</span>
+            <span class="line"></span>
+        </div>
+        <div class="icon-box">
+            <i class="iconfont" style="color: rgb(81, 195, 50)">&#xe600;</i>
+            <i class="iconfont" style="color: rgb(48, 165, 221)">&#xe73e;</i>
+            <i class="iconfont" style="color: rgb(230, 23, 45)">&#xe636;</i>
+        </div>
+    </form>
+</div>
+<div id="registerPopup">
+    <h3>用户注册</h3>
+    <form id="registerForm" action="/register" method="post">
+        <div>
+            <label>
+                <input type="text" name="account" class="common-input-box" placeholder="手机号/邮箱">
+            </label>
+        </div>
+        <div>
+            <label>
+                <input type="password" name="password" class="common-input-box" placeholder="密码">
+            </label>
+        </div>
+        <div>
+            <label>
+                <input type="text" name="nickname" class="common-input-box" placeholder="昵称">
+            </label>
+        </div>
+        <div>
+            <input type="text" name="avatar" class="common-input-box" placeholder="头像（图片 URL 地址）">
+        </div>
+        <div>
+            <input type="text" name="address" class="common-input-box" placeholder="地址">
+        </div>
+        <div>
+            <input type="button" value="关闭" class="close-btn">
+        </div>
+        <div>
+            <input type="submit" value="注册" id="registerBtn" class="btn">
+        </div>
+    </form>
+</div>
+
+<script>
+    $(document).ready(function () {
+        const showRegisterPopupBtn = $('#showRegisterPopup');
+        const registerPopup = $('#registerPopup');
+        const closeRegisterPopupBtn = $('#registerPopup.close-btn');
+        const registerBtn = $('#registerBtn');
+
+        // 显示注册弹窗
+        showRegisterPopupBtn.click(function () {
+            registerPopup.show();
+        });
+
+        // 关闭注册弹窗
+        closeRegisterPopupBtn.click(function () {
+            registerPopup.hide();
+        });
+
+        // 注册表单提交
+        registerBtn.click(function (e) {
+            e.preventDefault();
+
+            var formData = {
+                account: $('#registerPopup input[name="account"]').val(),
+                password: $('#registerPopup input[name="password"]').val(),
+                nickname: $('#registerPopup input[name="nickname"]').val(),
+                avatar: $('#registerPopup input[name="avatar"]').val(),
+                address: $('#registerPopup input[name="address"]').val()
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: '/register',
+                data: formData,
+                dataType: 'json',
+                success: function (response) {
+                    // 根据后端返回的结果显示相应提示信息
+                    if (response.message === "注册成功，请登录") {
+                        alert(response.message);
+                        registerPopup.hide();
+                        // 这里可以添加代码跳转到登录页面等后续操作
+                    } else if (response.message === "该用户名已被占用，请重新选择用户名") {
+                        alert(response.message);
+                        // 可以添加代码清空用户名输入框等操作，方便用户重新输入
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    // 处理请求出错的情况
+                    alert("注册请求出错，请稍后重试");
+                },
+            });
+        });
+    });
+</script>
 </body>
+
 </html>
