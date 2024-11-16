@@ -7,10 +7,9 @@ import lombok.Builder;
 
 /**
  * @author 11448
- * @description: TODO
+ * @description: 品牌实体类，用于存储品牌相关信息
  * @date 2024/11/9 16:13
  */
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -6,6 +6,7 @@
     <title>用户登录与注册</title>
     <link rel="stylesheet" href="css/style.css" type="text/css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style type="text/css">
         /*iconfont图标，第三方登录用*/
         @font-face {
@@ -18,7 +19,7 @@
             url('//at.alicdn.com/t/font_1427254_qm1jfg7xsu.svg#iconfont') format('svg');
         }
 
-        .iconfont {
+      .iconfont {
             font-family: "iconfont", serif!important;
             font-size: 28px;
             font-style: normal;
@@ -34,14 +35,14 @@
             width: 100vw;
             height: 100vh;
             display: flex;
-            flex-direction: column;
+            flex-direction: Column;
             align-items: center;
             justify-content: center;
             font-family: Arial, sans-serif;
         }
 
         /* 公共输入框样式 */
-        .common-input-box {
+      .common-input-box {
             width: 75%;
             padding: 12px 15px;
             background-color: #fff;
@@ -54,13 +55,13 @@
             transition: all 0.3s ease;
         }
 
-        .common-input-box:focus {
+      .common-input-box:focus {
             border-color: rgb(36, 169, 190);
             box-shadow: 0 0 5px rgba(36, 169, 190, 0.5);
         }
 
         /* 表单外层包裹容器样式 */
-        .form-wrap {
+      .form-wrap {
             width: 400px;
             height: auto;
             background-color: rgba(255, 255, 255, 0.8);
@@ -69,14 +70,14 @@
             padding: 20px;
         }
 
-        .sign-box {
+      .sign-box {
             width: 100%;
             display: flex;
             justify-content: space-between;
             margin-bottom: 20px;
         }
 
-        .sign-box h3 {
+      .sign-box h3 {
             flex: 1 1 50%;
             margin-bottom: 10px;
             padding-bottom: 5px;
@@ -87,23 +88,23 @@
             transition: all 0.3s ease;
         }
 
-        .default {
+      .default {
             color: #ddd;
             border-bottom: 1px solid #ddd;
         }
 
-        .active {
+      .active {
             color: rgb(36, 169, 190);
             border-bottom: 2px solid rgb(36, 169, 190);
         }
 
-        .active:hover,
-        .default:hover {
+      .active:hover,
+      .default:hover {
             color: rgb(36, 169, 190);
         }
 
         /* 登陆表单样式 */
-        .login-box {
+      .login-box {
             width: 100%;
             height: auto;
             padding: 0;
@@ -111,11 +112,11 @@
         }
 
         /* 按钮样式 */
-        .btn {
+      .btn {
             width: 100%;
             padding: 12px 0;
             border: none;
-            outline: none;
+            outline: None;
             border-radius: 5px;
             background-color: rgb(36, 169, 190);
             color: #fff;
@@ -125,25 +126,25 @@
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .btn:hover {
+      .btn:hover {
             background-color: rgb(26, 139, 160);
             box-shadow: 4px 7px 14px rgba(0, 0, 0, 0.2);
         }
 
         /* 两条线和第三方登录字样横条区 */
-        .line-box {
+      .line-box {
             width: 100%;
             margin-top: 20px;
             display: flex;
             align-items: center;
         }
 
-        .line {
+      .line {
             flex: 1 1 33%;
             border-bottom: 1px solid #9b9b9b;
         }
 
-        .login-3rd {
+      .login-3rd {
             flex: 1 1 30%;
             color: #9b9b9b;
             font-size: 11px;
@@ -151,14 +152,14 @@
         }
 
         /* 图标外层包裹区样式 */
-        .icon-box {
+      .icon-box {
             width: 100%;
             display: flex;
             justify-content: center;
             margin-top: 15px;
         }
 
-        .icon-box i {
+      .icon-box i {
             flex: 1 1 33%;
             font-size: 28px;
             color: #999;
@@ -166,7 +167,7 @@
             text-align: center;
         }
 
-        .icon-box i:hover {
+      .icon-box i:hover {
             color: rgb(36, 169, 190);
         }
 
@@ -232,139 +233,217 @@
             font-size: 24px;
             text-decoration: none;
         }
+
+        /* 记住我复选框包裹区域样式优化 */
+      .remember-box {
+            width: 70%;
+            display: flex;
+            align-items: center;
+        }
+
+        /* 输入框错误提示样式 */
+      .input-error {
+            color: red;
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* 响应式设计：不同屏幕尺寸调整样式 */
+        @media (max-width: 600px) {
+          .form-wrap {
+                width: 90%;
+            }
+
+          .common-input-box {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            /* 针对更小屏幕设备的进一步调整 */
+            body {
+                font-size: 12px;
+            }
+
+          .btn {
+                font-size: 14px;
+            }
+
+          .icon-box i {
+                font-size: 24px;
+            }
+        }
     </style>
 </head>
 
 <body>
-<div id="top">
-    <a href="/index">
-        <h2>book-online</h2>
-    </a>
-</div>
-<div class="form-wrap">
-    <form id="loginForm" action="/login" method="post" class="login-box">
-        <div class="sign-box">
-            <h3 class="active">密码登录</h3>
-            <h3 class="default">短信登录/注册</h3>
-        </div>
-        <div>
-            <label>
-                <input type="text" name="account" class="common-input-box" placeholder="手机号/邮箱">
-            </label>
-        </div>
-        <div>
-            <label>
+    <div id="top">
+        <a href="/index">
+            <h2>book-online</h2>
+        </a>
+    </div>
+    <div class="form-wrap">
+        <form id="loginForm" action="/login" method="post" class="login-box">
+            <div class="sign-box">
+                <h3 class="active">密码登录</h3>
+                <h3 class="default">短信登录/注册</h3>
+            </div>
+            <div>
+                <label>
+                    <input type="text" name="account" class="common-input-box" placeholder="手机号/邮箱" id="username">
+                    <span class="input-error" id="accountError"></span>
+                </label>
+            </div>
+            <div>
+                <label>
+                    <input type="password" name="password" class="common-input-box" placeholder="密码" id="password">
+                    <span class="input-error" id="passwordError"></span>
+                </label>
+            </div>
+
+            <div class="remember-box">
+                <p style="margin-right: 6px">记住我:</p>
+                <label>
+                    <input type="checkbox" id="remember" name="remember">
+                </label>
+            </div>
+
+            <div>
+                <label>
+                    <input type="submit" value="立即登录" class="btn">
+                </label>
+            </div>
+            <div>
+                <input type="button" value="注册" id="showRegisterPopup" class="btn">
+            </div>
+            <div class="line-box">
+                <span class="line"></span>
+                <span class="login-3rd">第三方登录</span>
+                <span class="line"></span>
+            </div>
+            <div class="icon-box">
+                <i class="iconfont" style="color: rgb(81, 195, 50)">&#xe600;</i>
+                <i class="iconfont" style="color: rgb(48, 165, 221)">&#xe73e;</i>
+                <i class="iconfont" style="color: rgb(230, 23, 45)">&#xe636;</i>
+            </div>
+        </form>
+    </div>
+    <div id="registerPopup">
+        <h3>用户注册</h3>
+        <form id="registerForm" action="/register" method="post">
+            <div>
+                <label>
+                    <input type="text" name="account" class="common-input-box" placeholder="手机号/邮箱">
+                    <span class="input-error" id="registerAccountError"></span>
+                </label>
+            </div>
+            <div>
                 <input type="password" name="password" class="common-input-box" placeholder="密码">
-            </label>
-        </div>
-        <div>
-            <label>
-                <input type="submit" value="立即登录" class="btn">
-            </label>
-        </div>
-        <div>
-            <input type="button" value="注册" id="showRegisterPopup" class="btn">
-        </div>
-        <div class="line-box">
-            <span class="line"></span>
-            <span class="login-3rd">第三方登录</span>
-            <span class="line"></span>
-        </div>
-        <div class="icon-box">
-            <i class="iconfont" style="color: rgb(81, 195, 50)">&#xe600;</i>
-            <i class="iconfont" style="color: rgb(48, 165, 221)">&#xe73e;</i>
-            <i class="iconfont" style="color: rgb(230, 23, 45)">&#xe636;</i>
-        </div>
-    </form>
-</div>
-<div id="registerPopup">
-    <h3>用户注册</h3>
-    <form id="registerForm" action="/register" method="post">
-        <div>
-            <label>
-                <input type="text" name="account" class="common-input-box" placeholder="手机号/邮箱">
-            </label>
-        </div>
-        <div>
-            <label>
-                <input type="password" name="password" class="common-input-box" placeholder="密码">
-            </label>
-        </div>
-        <div>
-            <label>
-                <input type="text" name="nickname" class="common-input-box" placeholder="昵称">
-            </label>
-        </div>
-        <div>
-            <input type="text" name="avatar" class="common-input-box" placeholder="头像（图片 URL 地址）">
-        </div>
-        <div>
-            <input type="text" name="address" class="common-input-box" placeholder="地址">
-        </div>
-        <div>
-            <input type="button" value="关闭" class="close-btn">
-        </div>
-        <div>
-            <input type="submit" value="注册" id="registerBtn" class="btn">
-        </div>
-    </form>
-</div>
+                <span class="input-error" id="registerPasswordError"></span>
+                </label>
+           </div>
+            <div>
+                <label>
+                    <input type="text" name="nickname" class="common-input-box" placeholder="昵称">
+                    <span class="input-error" id="registerNicknameError"></span>
+                </label>
+            </div>
+            <div>
+                <input type="text" name="avatar" class="common-input-box" placeholder="头像（图片 URL 地址）">
+                <span class="input-error" id="registerAvatarError"></span>
+                </label>
+            </div>
+            <div>
+                <input type="text" name="address" class="common-input-box" placeholder="地址">
+                <span class="input-error" id="registerAddressError"></span>
+                </label>
+            </div>
+            <div>
+                <input type="button" value="关闭" class="close-btn">
+            </div>
+            <div>
+                <input type="submit" value="注册" id="registerBtn" class="btn">
+            </div>
+        </form>
+    </div>
+    <script>
+        $(document).ready(function () {
+            const showRegisterPopupBtn = $('#showRegisterPopup');
+            const registerPopup = $('#registerPopup');
+            const closeRegisterPopupBtn = $('#registerPopup.close-btn');
+            const registerBtn = $('#registerBtn');
 
-<script>
-    $(document).ready(function () {
-        const showRegisterPopupBtn = $('#showRegisterPopup');
-        const registerPopup = $('#registerPopup');
-        const closeRegisterPopupBtn = $('#registerPopup.close-btn');
-        const registerBtn = $('#registerBtn');
+            // 显示注册弹窗
+            showRegisterPopupBtn.click(function () {
+                registerPopup.show();
+            });
 
-        // 显示注册弹窗
-        showRegisterPopupBtn.click(function () {
-            registerPopup.show();
-        });
+            // 关闭注册弹窗
+            closeRegisterPopupBtn.click(function () {
+                registerPopup.hide();
+            });
 
-        // 关闭注册弹窗
-        closeRegisterPopupBtn.click(function () {
-            registerPopup.hide();
-        });
+            // 注册表单提交
+            registerBtn.click(function (e) {
+                e.preventDefault();
 
-        // 注册表单提交
-        registerBtn.click(function (e) {
-            e.preventDefault();
+                var formData = {
+                    account: $('#registerPopup input[name="account"]').val(),
+                    password: $('#registerPopup input[name="password"]').val(),
+                    nickname: $('#registerPopup input[name="nickname"]').val(),
+                    avatar: $('#registerPopup input[name="avatar"]').val(),
+                    address: $('#registerPopup input[name="address"]').val()
+                };
 
-            var formData = {
-                account: $('#registerPopup input[name="account"]').val(),
-                password: $('#registerPopup input[name="password"]').val(),
-                nickname: $('#registerPopup input[name="nickname"]').val(),
-                avatar: $('#registerPopup input[name="avatar"]').val(),
-                address: $('#registerPopup input[name="address"]').val()
-            };
+                $.ajax({
+                    type: 'POST',
+                    url: 'http://localhost:8080/register' // 这里假设后端服务运行在localhost:8080，根据实际情况修改
+                    data: formData,
+                    dataType: 'json',
+                    success: function (response) {
+                        // 根据后端返回的结果显示相应提示信息
+                        if (response.message === "注册成功，请登录") {
+                            alert(response.message);
+                            registerPopup.hide();
+                            // 这里可以添加代码跳转到登录页面等后续操作
+                        } else if (response.message === "该用户名已被占用，请重新选择用户名") {
+                            alert(response.message);
+                            // 可以添加代码清空用户名输入框等操作，方便用户重新输入
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        // 处理请求出错的情况，提供更详细的错误信息
+                        if (xhr.status === 400) {
+                            alert("注册请求参数错误，请检查输入内容是否符合要求");
+                        } else if (xhr.status === 500) {
+                            alert("服务器端出现问题，请稍后重试");
+                        } else {
+                            alert("注册请求出错，请稍后重试");
+                        }
+                    },
+                });
+            });
 
-            $.ajax({
-                type: 'POST',
-                url: '/register',
-                data: formData,
-                dataType: 'json',
-                success: function (response) {
-                    // 根据后端返回的结果显示相应提示信息
-                    if (response.message === "注册成功，请登录") {
-                        alert(response.message);
-                        registerPopup.hide();
-                        // 这里可以添加代码跳转到登录页面等后续操作
-                    } else if (response.message === "该用户名已被占用，请重新选择用户名") {
-                        alert(response.message);
-                        // 可以添加代码清空用户名输入框等操作，方便用户重新输入
-                    } else {
-                        alert(response.message);
-                    }
-                },
-                error: function (xhr, status, error) {
-                    // 处理请求出错的情况
-                    alert("注册请求出错，请稍后重试");
-                },
+            // 验证账号格式的正则表达式
+            const accountRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$|^[1][3-9]\\d{9}$/;
+
+            const usernameInput = $('#username');
+            const passwordInput = $('#password');
+            const accountError = $('#accountError');
+
+            // 对账号输入框进行实时验证
+            usernameInput.on('input', function () {
+                const value = $(this).val();
+                if (!accountRegex.test(value)) {
+                    accountError.text('请输入正确的邮箱或手机号').show();
+                } else {
+                    accountError.hide();
+                }
             });
         });
-    });
-</script>
+    </script>
 </body>
 
 </html>
