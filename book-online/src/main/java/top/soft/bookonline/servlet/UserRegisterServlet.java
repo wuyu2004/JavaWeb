@@ -31,98 +31,96 @@ public class UserRegisterServlet extends HttpServlet {
         userDao = new UserDaoImpl();
     }
 
-@Override
-protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    // 设置响应内容类型为JSON
-    resp.setContentType("application/json;charset=UTF-8");
-    PrintWriter out = resp.getWriter();
-
-    // 获取注册表单数据
-    String account = req.getParameter("account");
-    String password = req.getParameter("password");
-    String nickname = req.getParameter("nickname");
-    String avatar = req.getParameter("avatar");
-    String address = req.getParameter("address");
-    String enteredCaptcha = req.getParameter("captcha");
-
-    // 获取当前会话
-    HttpSession session = req.getSession(false);
-    if (session == null) {
-        out.print("{\"message\":\"会话已失效，请重新获取验证码并注册\"}");
-        out.flush();
-        return;
-    }
-
-    // 从会话中获取存储的验证码
-    String storedCaptcha = (String) session.getAttribute("captchaCode");
-    if (storedCaptcha == null) {
-        out.print("{\"message\":\"请先获取验证码再注册\"}");
-        out.flush();
-        return;
-    }
-
-    // 检查验证码是否正确
-    if (!enteredCaptcha.equals(storedCaptcha)) {
-        out.print("{\"message\":\"验证码错误，请重新输入\"}");
-        out.flush();
-        return;
-    }
-
-    // 检查用户名是否已存在
-    if (userDao.checkAccountExists(account)) {
-        out.print("{\"message\":\"该用户名已被占用，请重新选择用户名\"}");
-        out.flush();
-        return;
-    }
-
-    // 创建用户对象
-    User user = User.builder()
-            .account(account)
-            .password(password)
-            .nickname(nickname)
-            .avatar(avatar)
-            .address(address)
-            .createTime(java.time.LocalDateTime.now())
-            .build();
-
-    // 插入新用户到数据库
-    int result = userDao.insertUser(user);
-    if (result > 0) {
-        out.print("{\"message\":\"注册成功，请登录\"}");
-        out.flush();
-    } else {
-        out.print("{\"message\":\"注册失败，请稍后重试\"}");
-        out.flush();
-    }
-}
-
-
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    // 如果请求参数中有"refreshCaptcha"且值为"true"，则重新生成验证码
-    boolean refreshCaptcha = "true".equals(req.getParameter("refreshCaptcha"));
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // 设置响应内容类型为JSON
+        resp.setContentType("application/json;charset=UTF-8");
+        PrintWriter out = resp.getWriter();
 
-    HttpSession session = req.getSession(true);
-    String captchaCode;
+        // 获取注册表单数据
+        String account = req.getParameter("account");
+        String password = req.getParameter("password");
+        String nickname = req.getParameter("nickname");
+        String avatar = req.getParameter("avatar");
+        String address = req.getParameter("address");
+        String enteredCaptcha = req.getParameter("captcha");
 
-    if (refreshCaptcha) {
-        captchaCode = generateCaptchaCode(4);
-        session.setAttribute("captchaCode", captchaCode);
-    } else {
-        captchaCode = (String) session.getAttribute("captchaCode");
-        if (captchaCode == null) {
-            captchaCode = generateCaptchaCode(4);
-            session.setAttribute("captchaCode", captchaCode);
+        // 获取当前会话
+        HttpSession session = req.getSession(false);
+        if (session == null) {
+            out.print("{\"message\":\"会话已失效，请重新获取验证码并注册\"}");
+            out.flush();
+            return;
+        }
+
+        // 从会话中获取存储的验证码
+        String storedCaptcha = (String) session.getAttribute("captchaCode");
+        if (storedCaptcha == null) {
+            out.print("{\"message\":\"请先获取验证码再注册\"}");
+            out.flush();
+            return;
+        }
+
+        // 检查验证码是否正确
+        if (!enteredCaptcha.equals(storedCaptcha)) {
+            out.print("{\"message\":\"验证码错误，请重新输入\"}");
+            out.flush();
+            return;
+        }
+
+        // 检查用户名是否已存在
+        if (userDao.checkAccountExists(account)) {
+            out.print("{\"message\":\"该用户名已被占用，请重新选择用户名\"}");
+            out.flush();
+            return;
+        }
+
+        // 创建用户对象
+        User user = User.builder()
+                .account(account)
+                .password(password)
+                .nickname(nickname)
+                .avatar(avatar)
+                .address(address)
+                .createTime(java.time.LocalDateTime.now())
+                .build();
+
+        // 插入新用户到数据库
+        int result = userDao.insertUser(user);
+        if (result > 0) {
+            out.print("{\"message\":\"注册成功，请登录\"}");
+            out.flush();
+        } else {
+            out.print("{\"message\":\"注册失败，请稍后重试\"}");
+            out.flush();
         }
     }
 
-    byte[] captchaImageBytes = generateCaptchaImage(captchaCode);
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // 如果请求参数中有"refreshCaptcha"且值为"true"，则重新生成验证码
+        boolean refreshCaptcha = "true".equals(req.getParameter("refreshCaptcha"));
 
-    resp.setContentType("image/png");
-    resp.getOutputStream().write(captchaImageBytes);
-    resp.getOutputStream().flush();
-}
+        HttpSession session = req.getSession(true);
+        String captchaCode;
 
+        if (refreshCaptcha) {
+            captchaCode = generateCaptchaCode(4);
+            session.setAttribute("captchaCode", captchaCode);
+        } else {
+            captchaCode = (String) session.getAttribute("captchaCode");
+            if (captchaCode == null) {
+                captchaCode = generateCaptchaCode(4);
+                session.setAttribute("captchaCode", captchaCode);
+            }
+        }
+
+        byte[] captchaImageBytes = generateCaptchaImage(captchaCode);
+
+        resp.setContentType("image/png");
+        resp.getOutputStream().write(captchaImageBytes);
+        resp.getOutputStream().flush();
+    }
 
     /**
      * 生成指定长度的随机验证码字符串
@@ -131,7 +129,7 @@ protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws S
      * @return 生成的验证码字符串
      */
     private String generateCaptchaCode(int length) {
-        // 验证码字符集，可以根据需要调整
+        // 验证码字符集，确保包含字母
         String captchaChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         Random random = new Random();
         StringBuilder captchaCode = new StringBuilder();
