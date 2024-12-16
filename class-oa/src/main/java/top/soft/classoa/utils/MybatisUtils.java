@@ -1,6 +1,4 @@
-
 package top.soft.classoa.utils;
-
 
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
@@ -12,12 +10,11 @@ import java.io.Reader;
 import java.util.function.Function;
 
 /**
- * @author 11448
+ * @author 1144
  * @description: TODO
  * @date 2024/11/30 14:07
  */
-
-public class MybatisUtils {
+public class MyBatisUtils {
     private static SqlSessionFactory sqlSessionFactory;
 
     static {
